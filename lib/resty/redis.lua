@@ -255,17 +255,22 @@ local function _gen_req(args)
 
     for i = 1, nargs do
         local arg = args[i]
-        if type(arg) ~= "string" then
-            arg = tostring(arg)
+        if not arg then
+            req[nbits] = "$-1\r\n"
+            nbits = nbits + 1
+        else
+            if type(arg) ~= "string" then
+                arg = tostring(arg)
+            end
+
+            req[nbits] = "$"
+            req[nbits + 1] = #arg
+            req[nbits + 2] = "\r\n"
+            req[nbits + 3] = arg
+            req[nbits + 4] = "\r\n"
+
+            nbits = nbits + 5
         end
-
-        req[nbits] = "$"
-        req[nbits + 1] = #arg
-        req[nbits + 2] = "\r\n"
-        req[nbits + 3] = arg
-        req[nbits + 4] = "\r\n"
-
-        nbits = nbits + 5
     end
 
     -- it is much faster to do string concatenation on the C land
